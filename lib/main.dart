@@ -1,3 +1,4 @@
+import 'package:demo_flutter/diary.dart';
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
@@ -9,7 +10,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Startup Name Generator',
-      home: RandomWords(),
+      // home: RandomWords(),
+      home: Diary(),
       );
   }
 }
