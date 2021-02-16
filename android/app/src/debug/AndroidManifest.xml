@@ -4,4 +4,6 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    // https://stackoverflow.com/questions/59638309/image-not-showing-from-internet-using-image-network
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 </manifest>
