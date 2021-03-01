@@ -2,27 +2,23 @@ import 'package:demo_flutter/util/StringUtils.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:demo_flutter/login/login_bloc.dart';
+import 'package:provider/provider.dart';
 
 // https://github.com/adar2378/pin_code_fields
 class OtpScreen extends StatefulWidget {
-  final String phoneNumber;
-
-  OtpScreen(this.phoneNumber);
-
   @override
-  _OtpScreen createState() => _OtpScreen(phoneNumber);
+  _OtpScreen createState() => _OtpScreen();
 }
 
 class _OtpScreen extends State<OtpScreen> {
-  final String phoneNumber;
-
   bool hasError = false;
   String currentText = "";
 
-  _OtpScreen(this.phoneNumber);
-
   @override
   Widget build(BuildContext context) {
+    LoginBloc _bloc = Provider.of<LoginBloc>(context);
+
     return Scaffold(
       body: GestureDetector(
         onTap: () {},
@@ -35,7 +31,7 @@ class _OtpScreen extends State<OtpScreen> {
                 _animation(),
                 SizedBox(height: 8,),
                 _title1(),
-                _title2("01012345678"),
+                _title2(_bloc.dialCode, _bloc.phone),
                 SizedBox(height: 20,),
                 _pinCodeForm(context),
                 _middlePadding(),
@@ -75,13 +71,21 @@ class _OtpScreen extends State<OtpScreen> {
     );
   }
 
-  Padding _title2(String phoneNumber) {
+  Padding _title2(String dialCode, String phoneNumber) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8),
       child: RichText(
         text: TextSpan(
             text: "Enter the code sent to ",
             children: [
+              TextSpan(
+                  text: dialCode,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  )
+              ),
               TextSpan(
                   text: phoneNumber,
                   style: TextStyle(

@@ -1,6 +1,7 @@
-import 'package:demo_flutter/login/login.dart';
+import 'package:demo_flutter/login/login_screen.dart';
+import 'package:demo_flutter/login/login_providers.dart';
 import 'package:flutter/material.dart';
-import 'package:demo_flutter/login/provider.dart';
+import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -8,15 +9,21 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return LoginBlocProvider(
+    return MultiProvider(
+      providers: _providers(),
       child: MaterialApp(
-        title: 'Login Demo',
-        home: LoginScreen(),
+        title: "Demo App",
+        home: Scaffold(
+          body: LoginScreen(),
+        ),
       ),
     );
-    // return MaterialApp(
-    //   title: 'Login Demo',
-    //   home: LoginScreen(),
-    //   );
+  }
+
+  List<SingleChildCloneableWidget> _providers() {
+    final List<SingleChildCloneableWidget> providers = new List();
+    providers.addAll(LoginProviders.providers());
+
+    return providers;
   }
 }
