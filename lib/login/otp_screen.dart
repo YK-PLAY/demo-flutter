@@ -3,6 +3,7 @@ import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:demo_flutter/login/login_bloc.dart';
+import 'package:demo_flutter/login/login_info.dart';
 import 'package:provider/provider.dart';
 
 // https://github.com/adar2378/pin_code_fields
@@ -38,7 +39,7 @@ class _OtpScreen extends State<OtpScreen> {
                 SizedBox(height: 20,),
                 _middleText(),
                 SizedBox(height: 14,),
-                _verifyButton(),
+                _verifyButton(context),
                 SizedBox(height: 16,),
                 _bottomButtons(),
               ]
@@ -187,14 +188,21 @@ class _OtpScreen extends State<OtpScreen> {
     );
   }
 
-  Container _verifyButton() {
+  Container _verifyButton(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 30),
       child: ButtonTheme(
         height: 50,
         child: FlatButton(
           onPressed: () {
-
+            print(currentText);
+            LoginInfo _bloc = Provider.of<LoginInfo>(context);
+            _bloc.setLogin(true);
+            Navigator.pop(context);
+            // Navigator.pushReplacement(
+            //     context,
+            //     MaterialPageRoute(builder: (context) => HomeScreen)
+            // );
           },
           child: Center(
             child: Text(
