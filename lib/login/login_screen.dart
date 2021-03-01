@@ -104,10 +104,19 @@ class _LoginScreenState extends State<LoginScreen> {
     return RaisedButton(
       onPressed: () {
         print("Phone: ${_bloc.phone}, dialCode: ${_bloc.dialCode}");
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => OtpScreen(),),
-        );
+
+        Function success = () {
+          Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => OtpScreen(),),
+                );
+        };
+
+        Function failure = () {
+          print('error');
+        };
+
+        _bloc.authReq(context, success, failure);
       },
       child: Text(
         "SUMMIT".toUpperCase(),

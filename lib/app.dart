@@ -26,6 +26,7 @@ class App extends StatelessWidget {
   List<SingleChildCloneableWidget> _providers() {
     final List<SingleChildCloneableWidget> providers = new List();
     providers.addAll(LoginProviders.providers());
+    providers.add(Provider<AppConfig>(create: (context) => config,));
 
     return providers;
   }

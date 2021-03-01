@@ -1,3 +1,4 @@
 {
-
+  "_comment": "use emulator and local server, use 10.0.2.2 auto forwarding to localhost, https://stackoverflow.com/questions/55785581/socketexception-os-error-connection-refused-errno-111-in-flutter-using-djan",
+  "host": "10.0.2.2:8080"
 }
