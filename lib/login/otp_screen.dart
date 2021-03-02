@@ -233,9 +233,10 @@ class _OtpScreen extends State<OtpScreen> {
     _bloc.verifyPinCode(context, verifySuccess(), verifyTooMany());
   }
 
-  Function(BuildContext) verifySuccess() {
-    return (BuildContext context) {
+  Function(BuildContext, String) verifySuccess() {
+    return (BuildContext context, String sessionKey) {
       LoginInfo _bloc = Provider.of<LoginInfo>(context);
+      _bloc.setSessionKey(sessionKey);
       _bloc.setLogin(true);
       Navigator.pop(context);
     };

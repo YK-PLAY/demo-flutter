@@ -97,7 +97,7 @@ class LoginBloc with ChangeNotifier {
     }
   }
 
-  void verifyPinCode(BuildContext context, Function(BuildContext) verifySuccess, Function(BuildContext) verifyTooMany) async {
+  void verifyPinCode(BuildContext context, Function(BuildContext, String) verifySuccess, Function(BuildContext) verifyTooMany) async {
     print("PinCode: $_pinCode");
 
     final AppConfig config = Provider.of<AppConfig>(context);
@@ -119,7 +119,8 @@ class LoginBloc with ChangeNotifier {
     final resMap = jsonDecode(response.body);
     final int status = resMap['status'];
     if(status == 0) {
-      verifySuccess(context);
+      String sessionKey = resMap['sessionKey'];
+      verifySuccess(context, sessionKey);
     } else {
       if(++_pinCodeErrorCount >= 3) {
         _pinCodeErrorCount = 0;
