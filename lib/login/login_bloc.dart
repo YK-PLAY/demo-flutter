@@ -63,22 +63,27 @@ class LoginBloc with ChangeNotifier {
     final String url = 'http://' + config.host + '/api/v1/auth/register';
     print(url);
 
-    final response = await http.post(
-      url,
-      headers: <String, String> {
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
-      body: jsonEncode(<String, String> {
-        'username': _phone,
-        'uuid': 'asdf',
-      }),
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: <String, String> {
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(<String, String> {
+          'username': _phone,
+          'uuid': 'asdf',
+        }),
+      );
 
-    final resMap = jsonDecode(response.body);
-    final int status = resMap['status'];
-    if(status == 0) {
-      success(context);
-    } else {
+      final resMap = jsonDecode(response.body);
+      final int status = resMap['status'];
+      if(status == 0) {
+        success(context);
+      } else {
+        failure();
+      }
+    } catch(_) {
+      print('Network error!');
       failure();
     }
   }
