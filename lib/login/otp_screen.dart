@@ -14,7 +14,6 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreen extends State<OtpScreen> {
   bool hasError = false;
-  String currentText = "";
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +34,9 @@ class _OtpScreen extends State<OtpScreen> {
                 _title2(_bloc.dialCode, _bloc.phone),
                 SizedBox(height: 20,),
                 _pinCodeForm(context),
-                _middlePadding(),
-                SizedBox(height: 20,),
-                _middleText(),
+                // _middlePadding(),
+                // SizedBox(height: 20,),
+                // _middleText(),
                 SizedBox(height: 14,),
                 _verifyButton(context),
                 SizedBox(height: 16,),
@@ -147,44 +146,13 @@ class _OtpScreen extends State<OtpScreen> {
         )
       ],
       onCompleted: (v) {
-        print('Completed');
+        _pressVerifyButton(context);
       },
       onChanged: (v) {
-        print(v);
-        setState(() {
-          currentText = v;
-        });
+        LoginBloc _bloc = Provider.of<LoginBloc>(context);
+        _bloc.setPinCode(v);
       },
       beforeTextPaste: (text) => false,
-    );
-  }
-
-  // TODO - find this role
-  Padding _middlePadding() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30.0),
-      child: Text(
-        hasError ? "*Please fill up all the cells properly" : "",
-        style: TextStyle(
-          color: Colors.red,
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-        ),
-      ),
-    );
-  }
-
-  RichText _middleText() {
-    return RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(
-          text: "Didn't receive the code? ",
-          style: TextStyle(
-            color: Color(0xFF91D383),
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          )
-      ),
     );
   }
 
@@ -195,14 +163,7 @@ class _OtpScreen extends State<OtpScreen> {
         height: 50,
         child: FlatButton(
           onPressed: () {
-            print(currentText);
-            LoginInfo _bloc = Provider.of<LoginInfo>(context);
-            _bloc.setLogin(true);
-            Navigator.pop(context);
-            // Navigator.pushReplacement(
-            //     context,
-            //     MaterialPageRoute(builder: (context) => HomeScreen)
-            // );
+            _pressVerifyButton(context);
           },
           child: Center(
             child: Text(
@@ -265,5 +226,22 @@ class _OtpScreen extends State<OtpScreen> {
     }
 
     return "Please input digit";
+  }
+
+  void _pressVerifyButton(BuildContext context) {
+    LoginBloc _bloc = Provider.of<LoginBloc>(context);
+    _bloc.verifyPinCode(context, verifySuccess(), verifyTooMany());
+  }
+
+  Function(BuildContext) verifySuccess() {
+    return (BuildContext context) {
+      LoginInfo _bloc = Provider.of<LoginInfo>(context);
+      _bloc.setLogin(true);
+      Navigator.pop(context);
+    };
+  }
+
+  Function(BuildContext) verifyTooMany() {
+    return (BuildContext context) => Navigator.pop(context);
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:country_code_picker/country_code.dart';
@@ -12,10 +13,14 @@ class LoginBloc with ChangeNotifier {
   String _phone;
   String _dialCode;
   String _alert = LoginConstants.validPhoneMessage;
+  String _pinCode;
+
+  int _pinCodeErrorCount = 0;
 
   String get phone => _phone;
   String get dialCode => _dialCode;
   String get alert => _alert;
+  String get pinCode => _pinCode;
 
   void setPhone(String value) {
     if(!RegExp(r"^(?:[+0]+)?[0-9]{6,14}$").hasMatch(value)) {
@@ -35,6 +40,11 @@ class LoginBloc with ChangeNotifier {
 
   void setAlert(String value) {
     _alert = value;
+    notifyListeners();
+  }
+
+  void setPinCode(String value) {
+    _pinCode = value;
     notifyListeners();
   }
 
@@ -63,21 +73,12 @@ class LoginBloc with ChangeNotifier {
     final String url = 'http://' + config.host + '/api/v1/auth/register';
     print(url);
 
-    final response = await http.post(
+    final response = await postJson(
       url,
-      headers: <String, String> {
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
       body: jsonEncode(<String, String> {
         'username': _phone,
         'uuid': 'asdf',
       }),
-    ).timeout(
-        Duration(seconds: 1),
-        onTimeout: () {
-          print('Timeout');
-          return null;
-        }
     );
 
     if(response == null) {
@@ -94,5 +95,52 @@ class LoginBloc with ChangeNotifier {
       failure();
       setAlert(LoginConstants.errorSummit);
     }
+  }
+
+  void verifyPinCode(BuildContext context, Function(BuildContext) verifySuccess, Function(BuildContext) verifyTooMany) async {
+    print("PinCode: $_pinCode");
+
+    final AppConfig config = Provider.of<AppConfig>(context);
+    final String url = 'http://' + config.host + '/api/v1/auth/register/auth';
+    print(url);
+
+    final response = await postJson(
+      url,
+      body: jsonEncode(<String, String> {
+        'username': _phone,
+        'authNumber': _pinCode,
+      }),
+    );
+
+    if(response == null) {
+      return;
+    }
+
+    final resMap = jsonDecode(response.body);
+    final int status = resMap['status'];
+    if(status == 0) {
+      verifySuccess(context);
+    } else {
+      if(++_pinCodeErrorCount >= 3) {
+        _pinCodeErrorCount = 0;
+        verifyTooMany(context);
+      }
+    }
+  }
+
+  Future<http.Response> postJson(String url, {body}) {
+    return http.post(
+      url,
+      headers: <String, String> {
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+      body: body
+    ).timeout(
+      Duration(seconds: 1),
+      onTimeout: () {
+        print('Timeout');
+        return null;
+      },
+    );
   }
 }
