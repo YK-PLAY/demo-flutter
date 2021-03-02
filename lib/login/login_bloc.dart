@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:country_code_picker/country_code.dart';
 import 'package:demo_flutter/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +27,14 @@ class LoginBloc with ChangeNotifier {
     _dialCode = value;
   }
 
-  void authReq(BuildContext context, Function success, Function failure) async {
+  void countryCodePickerOnPress(CountryCode countryCode) {
+    print(countryCode);
+    setDialCode(countryCode.dialCode);
+  }
+
+  void authReq(BuildContext context, Function(BuildContext) success, Function failure) async {
+    print("Phone: $_phone, dialCode: $_dialCode");
+
     final AppConfig config = Provider.of<AppConfig>(context);
     final String url = 'http://' + config.host + '/api/v1/auth/register';
     print(url);
@@ -45,7 +53,7 @@ class LoginBloc with ChangeNotifier {
     final resMap = jsonDecode(response.body);
     final int status = resMap['status'];
     if(status == 0) {
-      success();
+      success(context);
     } else {
       failure();
     }

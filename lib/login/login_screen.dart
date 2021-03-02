@@ -65,10 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Padding(
               padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
               child: CountryCodePicker(
-                onChanged: (countryCode) {
-                  print(countryCode);
-                  _bloc.setDialCode(countryCode.dialCode);
-                },
+                onChanged: _bloc.countryCodePickerOnPress,
                 initialSelection: _myLocale.countryCode,
                 favorite: [_myLocale.countryCode],
                 showCountryOnly: false,
@@ -102,22 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
     LoginBloc _bloc = Provider.of<LoginBloc>(context);
 
     return RaisedButton(
-      onPressed: () {
-        print("Phone: ${_bloc.phone}, dialCode: ${_bloc.dialCode}");
-
-        Function success = () {
-          Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => OtpScreen(),),
-                );
-        };
-
-        Function failure = () {
-          print('error');
-        };
-
-        _bloc.authReq(context, success, failure);
-      },
+      onPressed: () => _bloc.authReq(context, _summitSuccess(), _summitFailure()),
       child: Text(
         "SUMMIT".toUpperCase(),
         style: TextStyle(
@@ -129,5 +111,18 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       color: Colors.blue,
     );
+  }
+
+  Function(BuildContext) _summitSuccess() {
+    return (BuildContext context) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => OtpScreen(),),
+      );
+    };
+  }
+
+  Function _summitFailure() {
+    return () => print('error');
   }
 }
