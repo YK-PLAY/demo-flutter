@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:country_code_picker/country_code.dart';
 import 'package:country_code_picker/country_codes.dart';
 import 'package:demo_flutter/app_config.dart';
+import 'package:demo_flutter/login/login_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -10,9 +11,11 @@ import 'package:http/http.dart' as http;
 class LoginBloc with ChangeNotifier {
   String _phone;
   String _dialCode;
+  String _alert = LoginConstants.validPhoneMessage;
 
   String get phone => _phone;
   String get dialCode => _dialCode;
+  String get alert => _alert;
 
   void setPhone(String value) {
     _phone = value;
@@ -20,7 +23,18 @@ class LoginBloc with ChangeNotifier {
   }
 
   void setDialCode(String value) {
+    if(!RegExp(r"^(?:[+0]+)?[0-9]{6,14}$").hasMatch(value)) {
+      _alert = LoginConstants.errorPhone;
+    } else {
+      _alert = LoginConstants.validPhoneMessage;
+    }
+
     _dialCode = value;
+    notifyListeners();
+  }
+
+  void setAlert(String value) {
+    _alert = value;
     notifyListeners();
   }
 

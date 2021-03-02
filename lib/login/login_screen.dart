@@ -2,6 +2,7 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:demo_flutter/home/home.dart';
 import 'package:demo_flutter/login/login_bloc.dart';
 import 'package:demo_flutter/login/login_info.dart';
+import 'package:demo_flutter/login/login_constants.dart';
 import 'package:demo_flutter/login/otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          _phoneInputForm(context, "Some error!"),
+          _phoneInputForm(context),
           SizedBox(height: 32,),
           _summitButton(context),
           SizedBox(height: 32,),
@@ -49,44 +50,54 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _phoneInputForm(BuildContext context, String error) {
-    LoginBloc _bloc = Provider.of<LoginBloc>(context);
-
+  Widget _phoneInputForm(BuildContext context) {
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Flexible(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
-              child: CountryCodePicker(
-                onChanged: _bloc.countryCodePickerOnPress,
-                initialSelection: _myLocale.countryCode,
-                favorite: [_myLocale.countryCode],
-                showCountryOnly: false,
-                alignLeft: true,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: TextField(
-              onChanged: _bloc.setPhone,
-              keyboardType: TextInputType.phone,
-              style: TextStyle(fontSize: 20),
-              decoration: InputDecoration(
-                hintText: "Please enter your phone",
-                errorText: error,
-                labelText: "Phone",
-                labelStyle: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
+          _phoneCountryCodeInput(context),
+          _phoneNumberInput(context),
         ],
+      ),
+    );
+  }
+
+  Widget _phoneCountryCodeInput(BuildContext context) {
+    LoginBloc _bloc = Provider.of<LoginBloc>(context);
+
+    return Flexible(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(0, 16, 0, 0),
+        child: CountryCodePicker(
+          onChanged: _bloc.countryCodePickerOnPress,
+          initialSelection: _myLocale.countryCode,
+          favorite: [_myLocale.countryCode],
+          showCountryOnly: false,
+          alignLeft: true,
+        ),
+      ),
+    );
+  }
+
+  Widget _phoneNumberInput(BuildContext context) {
+    LoginBloc _bloc = Provider.of<LoginBloc>(context);
+
+    return Expanded(
+      flex: 2,
+      child: TextField(
+        onChanged: _bloc.setPhone,
+        keyboardType: TextInputType.phone,
+        style: TextStyle(fontSize: 20),
+        decoration: InputDecoration(
+          hintText: LoginConstants.phoneInputHintText,
+          errorText: _bloc.alert,
+          labelText: LoginConstants.phoneInputLabelText,
+          labelStyle: TextStyle(
+            color: Colors.blue,
+            fontSize: 16,
+          ),
+        ),
       ),
     );
   }
@@ -97,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return RaisedButton(
       onPressed: () => _bloc.authReq(context, _summitSuccess(), _summitFailure()),
       child: Text(
-        "SUMMIT".toUpperCase(),
+        LoginConstants.phoneSummitButtonText,
         style: TextStyle(
           color: Colors.white,
         ),
