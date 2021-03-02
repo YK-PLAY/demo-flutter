@@ -1,8 +1,7 @@
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:country_code_picker/country_codes.dart';
 import 'package:demo_flutter/home/home.dart';
-import 'package:demo_flutter/login/login_info.dart';
 import 'package:demo_flutter/login/login_bloc.dart';
+import 'package:demo_flutter/login/login_info.dart';
 import 'package:demo_flutter/login/otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,17 +24,14 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final String dialCode = codes
-        .map((e) => CountryCode(name: "", code: e['code'], dialCode: e['dial_code']))
-        .firstWhere((element) => element.code == _myLocale.countryCode)
-        .dialCode;
-    LoginBloc _bloc = Provider.of<LoginBloc>(context);
-    _bloc.setDialCodeWithoutNotify(dialCode);
+    // do it after initialize the context
+    Provider
+        .of<LoginBloc>(context)
+        .initializeDialCode(_myLocale);
   }
 
   Widget _loginForm(BuildContext context) {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:country_code_picker/country_code.dart';
+import 'package:country_code_picker/country_codes.dart';
 import 'package:demo_flutter/app_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,15 @@ class LoginBloc with ChangeNotifier {
 
   void setDialCodeWithoutNotify(String value) {
     _dialCode = value;
+  }
+
+  void initializeDialCode(Locale locale) {
+    final String dialCode = codes
+        .map((e) => CountryCode(name: "", code: e['code'], dialCode: e['dial_code']))
+        .firstWhere((element) => element.code == locale.countryCode)
+        .dialCode;
+
+    setDialCodeWithoutNotify(dialCode);
   }
 
   void countryCodePickerOnPress(CountryCode countryCode) {
