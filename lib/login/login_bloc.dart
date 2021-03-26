@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:country_code_picker/country_code.dart';
 import 'package:country_code_picker/country_codes.dart';
@@ -70,63 +71,70 @@ class LoginBloc with ChangeNotifier {
     print("Phone: $_phone, dialCode: $_dialCode");
 
     final AppConfig config = Provider.of<AppConfig>(context);
-    final String url = 'http://' + config.host + '/api/v1/auth/register';
+    final String url = 'http://' + config.host + '/api/v1.0/auth/user/certification-number';
     print(url);
 
     final response = await postJson(
       url,
       body: jsonEncode(<String, String> {
-        'username': _phone,
-        'uuid': 'asdf',
+        'cellphone': _phone,
+        'deviceId': 'asdf',
       }),
     );
 
-    if(response == null) {
+    if(response == null || response.statusCode != HttpStatus.created) {
+      print(response.statusCode);
       failure();
       setAlert(LoginConstants.errorSummit);
       return;
     }
 
-    final resMap = jsonDecode(response.body);
-    final int status = resMap['status'];
-    if(status == 0) {
-      success(context);
-    } else {
-      failure();
-      setAlert(LoginConstants.errorSummit);
-    }
+    success(context);
   }
 
   void verifyPinCode(BuildContext context, Function(BuildContext, String) verifySuccess, Function(BuildContext) verifyTooMany) async {
     print("PinCode: $_pinCode");
 
     final AppConfig config = Provider.of<AppConfig>(context);
-    final String url = 'http://' + config.host + '/api/v1/auth/register/auth';
+    final String url = 'http://' + config.host + '/api/v1.0/auth/user/token';
     print(url);
 
     final response = await postJson(
       url,
       body: jsonEncode(<String, String> {
-        'username': _phone,
+        'cellphone': _phone,
+        'deviceId': 'asdf',
         'authNumber': _pinCode,
       }),
     );
 
-    if(response == null) {
-      return;
-    }
-
-    final resMap = jsonDecode(response.body);
-    final int status = resMap['status'];
-    if(status == 0) {
-      String sessionKey = resMap['sessionKey'];
-      verifySuccess(context, sessionKey);
-    } else {
+    if(response == null || response.statusCode != HttpStatus.ok) {
       if(++_pinCodeErrorCount >= 3) {
         _pinCodeErrorCount = 0;
         verifyTooMany(context);
       }
+      return;
     }
+
+    final resMap = jsonDecode(response.body);
+    final token = resMap['token'];
+    print('token: $token');
+    verifySuccess(context, token);
+  }
+
+  Future<http.Response> getJson(String url, {body}) {
+    return http.get(
+        url,
+        headers: <String, String> {
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+    ).timeout(
+      Duration(seconds: 1),
+      onTimeout: () {
+        print('Timeout');
+        return null;
+      },
+    );
   }
 
   Future<http.Response> postJson(String url, {body}) {
@@ -137,7 +145,7 @@ class LoginBloc with ChangeNotifier {
       },
       body: body
     ).timeout(
-      Duration(seconds: 1),
+      Duration(seconds: 10),
       onTimeout: () {
         print('Timeout');
         return null;
