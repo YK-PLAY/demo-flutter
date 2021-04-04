@@ -23,101 +23,86 @@ class _HomeScreenState extends State<HomeScreen> {
     // getData();
   }
 
-  getData(String token) async {
-    Map<String, String> header = {
-      "Authorization": " Bearer $token",
-    };
-    final AppConfig config = Provider.of<AppConfig>(context);
-    http.Response r = await http.get('http://${config.host}/api/v1.0/diary/my/list?page=1&per-page=15', headers: header);
-    Map body = json.decode(r.body);
-
-    print(body);
-    if(body['total'] > 0) {
-      List list = body['list'];
-      if(list != null && list.length > 0) {
-        if(fd == null) fd = new List();
-        for(int i = 0; i < list.length; i++) {
-          fd.add(list[i]);
-        }
-      }
-    }
-
-    if(!load) {
-      load = true;
-      setState(() {
-        if(fd != null && fd.length > 0) {
-          fi = fd[0];
-        }
-      });
-    }
-
-    // if(body != null && body.length > 0) {
-    //   if(fd == null) fd = new List();
-    //
-    //   for(int i = 0; i < body.length; i++) {
-    //     if(body.containsKey(i.toString())) {
-    //       fd.add(body[i.toString()]);
-    //       print(body[i.toString()]['fd']);
-    //     }
-    //   }
-    // }
-
-    // setState(() {
-    //   if(fd != null && fd.length > 0) {
-    //     fi = fd[0];
-    //   } else {
-    //     print("???");
-    //   }
-    // });
-  }
-
   @override
   Widget build(BuildContext context) {
-    LoginInfo _bloc = Provider.of<LoginInfo>(context);
-    if(_bloc != null) {
-      print('Home sessionKey: ${_bloc.sessionKey}');
-      getData(_bloc.sessionKey);
-    }
-
-    if(fd == null) return defaultContainer();
-
-
     return Scaffold(
+      appBar: appBar(),
       body: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          expanded()
+          // Container(
+          //   alignment: Alignment.bottomLeft,
+          //   child: Text('Headline', style: TextStyle(fontSize: 18),),
+          // ),
+          Expanded(
+            flex: 1,
+            child: Text('Headline', style: TextStyle(fontSize: 18),),
+          ),
+          Expanded(
+            flex: 2,
+            child: Container(
+              height: 50,
+              alignment: Alignment.bottomLeft,
+              child: ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: 10,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      child: Center(child: image(index),),
+                    );
+                  }
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text('Headline2', style: TextStyle(fontSize: 18),),
+          ),
+          Expanded(
+            flex: 15,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return Card(
+                  // child: ListTile(
+                  //   title: Text('Motivation $index'),
+                  //   subtitle: Text('This is a description of the motivation'),
+                  // ),
+                  child: image(index, size: 200),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Container defaultContainer() {
-    return Container(
-      color: Colors.white,
-      child: Center(child: CircularProgressIndicator(),),
-    );
+  Widget image(int index, {double size = 50}) {
+    switch(index % 3) {
+      case 0:
+        return Image.network('https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg', width: size, height: size,);
+      case 1:
+        return Image.network('https://thumbs.dreamstime.com/b/monarch-orange-butterfly-bright-summer-flowers-background-blue-foliage-fairy-garden-macro-artistic-image-monarch-167030287.jpg', width: size, height: size,);
+      default:
+        return Image.network('https://image.shutterstock.com/image-photo/mountains-under-mist-morning-amazing-260nw-1725825019.jpg', width: size, height: size,);
+    }
   }
 
-  Expanded expanded() {
-    return Expanded(
-      flex: 5,
-      child: Swiper(
-        onIndexChanged: (i) => setState(() => fi = fd[i]),
-        itemCount: fd.length,
-        itemBuilder: (context, i) {
-          return Container(
-            margin: EdgeInsets.only(top: 40, bottom: 24),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              // child: Hero(tag: fd[i]['fn'], child: Image.network('https://raw.githubusercontent.com/markgrancapal/filipino_cuisine/master/assets/' + fd[i]['pf'], fit: BoxFit.cover,),),
-              child: Hero(tag: 'test', child: Image.network(fd[i]['imageUrl'], fit: BoxFit.cover,),),
-            ),
-          );
-        },
-        viewportFraction: .85,
-        scale: .9,
-      ),
+  Widget appBar() {
+    return AppBar(
+      leading: Icon(Icons.error),
+      title: Text('다꾸러'),
+      actions: [
+        Icon(Icons.favorite),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Icon(Icons.search),
+        ),
+        Icon(Icons.more_vert),
+      ],
+      backgroundColor: Colors.blue,
     );
   }
-
 }
