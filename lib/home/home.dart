@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:demo_flutter/app_config.dart';
 import 'package:demo_flutter/login/login_info.dart';
+import 'package:demo_flutter/home/header.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
@@ -30,31 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Container(
-          //   alignment: Alignment.bottomLeft,
-          //   child: Text('Headline', style: TextStyle(fontSize: 18),),
-          // ),
-          Expanded(
-            flex: 1,
-            child: Text('Headline', style: TextStyle(fontSize: 18),),
-          ),
-          Expanded(
-            flex: 2,
-            child: Container(
-              height: 50,
-              alignment: Alignment.bottomLeft,
-              child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      child: Center(child: image(index),),
-                    );
-                  }
-              ),
-            ),
-          ),
+          HeaderScreen(),
           Expanded(
             flex: 1,
             child: Text('Headline2', style: TextStyle(fontSize: 18),),
