@@ -7,10 +7,16 @@ import 'package:country_code_picker/country_codes.dart';
 import 'package:demo_flutter/app_config.dart';
 import 'package:demo_flutter/login/login_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 class LoginBloc with ChangeNotifier {
+  static const String TOKEN_SECURITY_KEY = 'token';
+
+  // Create storage
+  final storage = new FlutterSecureStorage();
+
   String _phone;
   String _dialCode;
   String _alert = LoginConstants.validPhoneMessage;
@@ -60,6 +66,36 @@ class LoginBloc with ChangeNotifier {
         .dialCode;
 
     setDialCodeWithoutNotify(dialCode);
+  }
+
+  Future<String> validToken(BuildContext context) {
+    return storage.read(key: TOKEN_SECURITY_KEY).then((token) async {
+      if(token?.isEmpty?? true) {
+        return null;
+      }
+
+      final AppConfig config = Provider.of<AppConfig>(context);
+      final String url = 'http://' + config.host + '/api/v1.0/auth/user/token/$token/expiry-date';
+      final response = await getJson(url,);
+      if(response == null || response.statusCode != HttpStatus.ok) {
+        return null;
+      }
+
+      print(response.body);
+      final resMap = jsonDecode(response.body);
+      final bool refreshable = resMap['refreshable'];
+      if(refreshable) return null;
+
+      return token;
+    });
+  }
+
+  void saveToken(String token) {
+    if(token?.isEmpty?? true) {
+      return;
+    }
+
+    storage.write(key: TOKEN_SECURITY_KEY, value: token).then((_) => print('Save token done.'));
   }
 
   void countryCodePickerOnPress(CountryCode countryCode) {
@@ -129,7 +165,7 @@ class LoginBloc with ChangeNotifier {
           'Content-Type': 'application/json; charset=UTF-8'
         },
     ).timeout(
-      Duration(seconds: 1),
+      Duration(seconds: 10),
       onTimeout: () {
         print('Timeout');
         return null;

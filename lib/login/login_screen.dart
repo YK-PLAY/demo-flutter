@@ -14,6 +14,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   Locale _myLocale = Locale('ko', 'KR');
+  bool called = false;
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +31,31 @@ class _LoginScreenState extends State<LoginScreen> {
     super.didChangeDependencies();
 
     // do it after initialize the context
-    Provider
-        .of<LoginBloc>(context)
-        .initializeDialCode(_myLocale);
+    final loginInfo = Provider.of<LoginInfo>(context);
+    if(called && !loginInfo.login) {
+      return;
+    }
+
+    called = true;
+
+    final loginBloc = Provider.of<LoginBloc>(context);
+    if(loginInfo.login) {
+      loginBloc.saveToken(loginInfo.sessionKey);
+      return;
+    }
+
+    loginBloc.initializeDialCode(_myLocale);
+    loginBloc.validToken(context).then((token) {
+      if(token?.isEmpty?? true) {
+        print('There is no valid token.');
+      } else {
+        final _bloc = Provider.of<LoginInfo>(context);
+        _bloc.setSessionKey(token);
+        _bloc.setLogin(true);
+
+        setState(() {});
+      }
+    });
   }
 
   Widget _loginForm(BuildContext context) {
